@@ -1,0 +1,24 @@
+{
+  "name": "twisearch",
+  "version": "1.0.0",
+  "description": "Twisearch create url with queries for twitter.",
+  "main": "index.js",
+  "scripts": {
+    "test": "twisearch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yamatatsu10969/twisearch.git"
+  },
+  "keywords": [
+    "twitter",
+    "search",
+    "query"
+  ],
+  "author": "Tatsuya Yamamoto <52.wadachi.96+job@gmail.com> (https://github.com/yamatatsu10969)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yamatatsu10969/twisearch/issues"
+  },
+  "homepage": "https://github.com/yamatatsu10969/twisearch#readme"
+}
