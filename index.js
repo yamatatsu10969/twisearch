@@ -16,7 +16,7 @@ const prompt = new Form({
   name: 'twesearch',
   message: 'Please input the following information:',
   choices: [
-    { name: 'keyword', message: 'Keyword', initial: '' },
+    { name: 'keywords', message: 'Keywords', initial: '' },
     { name: 'min_faves', message: 'Min Favorites', initial: '0' },
     { name: 'min_retweets', message: 'Min Retweets', initial: '0' }
   ]
@@ -30,7 +30,7 @@ prompt.run()
     }
     // example: https://twitter.com/search?q=Flutter%20min_faves%3A10&src=typed_query&f=top
     const baseUrl = 'https://twitter.com/search'
-    var queries = '?q=' + value['keyword']
+    var queries = '?q=' + value['keywords']
     queries += ' min_faves:' + value['min_faves']
     queries += ' min_retweets:' + value['min_retweets']
     queries += '&src=typed_query&f=top'
