@@ -19,12 +19,43 @@ class Key {
   static to = 'to'
   static since = 'since'
   static until = 'until'
-  static filterImages = 'filter_images'
-  static filterVideos = 'filter_videos'
-  static filterLinks = 'filter_links'
+  static filterImages = 'filter:images'
+  static filterVideos = 'filter:videos'
+  static filterLinks = 'filter:links'
 }
 
-const exampleFormText = `
+class Query {
+  constructor (key, description, type, defaultValue) {
+    this.key = key
+    this.description = description
+    this.type = type
+    this.defaultValue = defaultValue
+  }
+
+  setValue (value) {
+    this.value = value
+  }
+
+  toString () {
+    const value = this.value || this.defaultValue
+    if (this.type === Boolean && value === 'true') {
+      return this.key
+    }
+    if (this.type === String) {
+      if (this.key === Key.keywords) {
+        return value
+      }
+      return value === '' ? '' : `${this.key}:${value}`
+    }
+    if (this.type === Number) {
+      return `${this.key}:${value}`
+    }
+    return ''
+  }
+}
+
+function showHelp () {
+  const exampleFormText = `
 Example Form:
 
                 Keywords : Twitter Fun
@@ -36,70 +67,56 @@ Example Form:
       Since (yyyy-mm-dd) : 2020-03-09
       Until (yyyy-mm-dd) : 2022-10-28
            Filter images : true
-           Filter videos : true
-            Filter links : true
+           Filter videos :
+            Filter links : false
 `
-console.log(exampleFormText)
+  console.log(exampleFormText)
+}
+
+showHelp()
+
+const queries = [
+  new Query(Key.keywords, 'Keywords', String, ''),
+  new Query(Key.minFaves, 'Min favorites', Number, 0),
+  new Query(Key.minRetweets, 'Min retweets', Number, 0),
+  new Query(Key.from, 'From user name', String, ''),
+  new Query(Key.exceptFrom, 'Except from user name', String, ''),
+  new Query(Key.to, 'To user name', String, ''),
+  new Query(Key.since, 'Since (yyyy-mm-dd)', Date, ''),
+  new Query(Key.until, 'Until (yyyy-mm-dd)', Date, ''),
+  new Query(Key.filterImages, 'Filter images', Boolean, ''),
+  new Query(Key.filterVideos, 'Filter videos', Boolean, ''),
+  new Query(Key.filterLinks, 'Filter links', Boolean, '')
+]
 
 const prompt = new Form({
   name: 'twesearch',
   message: 'Please input the following information:',
-  choices: [
-    { name: Key.keywords, message: 'Keywords', initial: '' },
-    { name: Key.minFaves, message: 'Min favorites', initial: '0' },
-    { name: Key.minRetweets, message: 'Min retweets', initial: '0' },
-    { name: Key.from, message: 'From user name', initial: '' },
-    { name: Key.exceptFrom, message: 'Except from user name', initial: '' },
-    { name: Key.to, message: 'To user name', initial: '' },
-    { name: Key.since, message: 'Since (yyyy-mm-dd)', initial: '' },
-    { name: Key.until, message: 'Until (yyyy-mm-dd)', initial: '' },
-    { name: Key.filterImages, message: 'Filter images', initial: '' },
-    { name: Key.filterVideos, message: 'Filter videos', initial: '' },
-    { name: Key.filterLinks, message: 'Filter links', initial: '' }
-  ]
+  choices: queries.map(query => {
+    return {
+      name: query.key,
+      message: query.description,
+      initial: query.defaultValue
+    }
+  })
+
 })
 
 prompt.run()
   .then(value => {
+    queries.forEach(query => {
+      query.setValue(value[query.key])
+    })
     if (value.keywords === '' && value.from === '' && value.to === '') {
       console.log('Keywords or From user name or To user name is required')
       return
     }
     // example: https://twitter.com/search?q=Flutter%20min_faves%3A10&src=typed_query&f=top
-    const baseUrl = 'https://twitter.com/search'
-    let queries = '?q=' + value.keywords
-    queries += ' min_faves:' + value.min_faves
-    queries += ' min_retweets:' + value.min_retweets
+    const baseUrl = 'https://twitter.com/search?q='
 
-    // queries
-    if (value.from !== '') {
-      queries += ' from:' + value.from
-    }
-    if (value['-from'] !== '') {
-      queries += ' -from:' + value.from
-    }
-    if (value.to !== '') {
-      queries += ' to:' + value.to
-    }
-    if (value.since !== '') {
-      queries += ' since:' + value.since
-    }
-    if (value.until !== '') {
-      queries += ' until:' + value.until
-    }
-    if (value['filter:images'] === 'true') {
-      queries += ' filter:images'
-    }
-    if (value['filter:videos'] === 'true') {
-      queries += ' filter:videos'
-    }
-    if (value['filter:links'] === 'true') {
-      queries += ' filter:links'
-    }
+    const querySuffix = '&src=typed_query&f=top'
 
-    queries += '&src=typed_query&f=top'
-
-    const uri = baseUrl + queries
+    const uri = baseUrl + queries.join(' ') + querySuffix
     const url = encodeURI(uri)
     console.log(url)
 
@@ -113,7 +130,3 @@ prompt.run()
     exec(command)
   })
   .catch(console.error)
-
-class Query {
-
-}
