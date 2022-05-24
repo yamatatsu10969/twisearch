@@ -10,6 +10,20 @@ const WINDOWS_PLATFORM = 'win32'
 const MAC_PLATFORM = 'darwin'
 const osPlatform = platform()
 
+class Key {
+  static keywords = 'keywords'
+  static minFaves = 'min_faves'
+  static minRetweets = 'min_retweets'
+  static from = 'from'
+  static exceptFrom = '-from'
+  static to = 'to'
+  static since = 'since'
+  static until = 'until'
+  static filterImages = 'filter_images'
+  static filterVideos = 'filter_videos'
+  static filterLinks = 'filter_links'
+}
+
 const exampleFormText = `
 Example Form:
 
@@ -31,17 +45,17 @@ const prompt = new Form({
   name: 'twesearch',
   message: 'Please input the following information:',
   choices: [
-    { name: 'keywords', message: 'Keywords', initial: '' },
-    { name: 'min_faves', message: 'Min favorites', initial: '0' },
-    { name: 'min_retweets', message: 'Min retweets', initial: '0' },
-    { name: 'from', message: 'From user name', initial: '' },
-    { name: '-from', message: 'Except from user name', initial: '' },
-    { name: 'to', message: 'To user name', initial: '' },
-    { name: 'since', message: 'Since (yyyy-mm-dd)', initial: '' },
-    { name: 'until', message: 'Until (yyyy-mm-dd)', initial: '' },
-    { name: 'filter:images', message: 'Filter images', initial: '' },
-    { name: 'filter:videos', message: 'Filter videos', initial: '' },
-    { name: 'filter:links', message: 'Filter links', initial: '' }
+    { name: Key.keywords, message: 'Keywords', initial: '' },
+    { name: Key.minFaves, message: 'Min favorites', initial: '0' },
+    { name: Key.minRetweets, message: 'Min retweets', initial: '0' },
+    { name: Key.from, message: 'From user name', initial: '' },
+    { name: Key.exceptFrom, message: 'Except from user name', initial: '' },
+    { name: Key.to, message: 'To user name', initial: '' },
+    { name: Key.since, message: 'Since (yyyy-mm-dd)', initial: '' },
+    { name: Key.until, message: 'Until (yyyy-mm-dd)', initial: '' },
+    { name: Key.filterImages, message: 'Filter images', initial: '' },
+    { name: Key.filterVideos, message: 'Filter videos', initial: '' },
+    { name: Key.filterLinks, message: 'Filter links', initial: '' }
   ]
 })
 
@@ -99,3 +113,7 @@ prompt.run()
     exec(command)
   })
   .catch(console.error)
+
+class Query {
+
+}
