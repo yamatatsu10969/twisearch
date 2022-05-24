@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 const { Form } = require('enquirer')
+const Key = require('./key')
+const Query = require('./query')
 
 // TODO(yamatatsu):  Search required installed packages
 const { platform } = require('os')
@@ -9,71 +11,6 @@ const { exec } = require('child_process')
 const WINDOWS_PLATFORM = 'win32'
 const MAC_PLATFORM = 'darwin'
 const osPlatform = platform()
-
-class Key {
-  static keywords = 'keywords'
-  static minFaves = 'min_faves'
-  static minRetweets = 'min_retweets'
-  static from = 'from'
-  static exceptFrom = '-from'
-  static to = 'to'
-  static since = 'since'
-  static until = 'until'
-  static filterImages = 'filter:images'
-  static filterVideos = 'filter:videos'
-  static filterLinks = 'filter:links'
-}
-
-class Query {
-  constructor (key, description, type, defaultValue) {
-    this.key = key
-    this.description = description
-    this.type = type
-    this.defaultValue = defaultValue
-  }
-
-  setValue (value) {
-    this.value = value
-  }
-
-  validate () {
-    if (this.type === Number && this.value < 0) {
-      console.log('Invalid number. Please use positive number')
-      process.exit(1)
-    }
-    if (this.type === Date && this.value !== '') {
-      if (!this.value.match(/\d{4}-\d{2}-\d{2}/)) {
-        console.log(`Invalid date format. Please use yyyy-mm-dd. Your input data: ${this.value}`)
-        process.exit(1)
-      }
-      const date = new Date(this.value)
-      if (isNaN(date.getDate())) {
-        console.log(`Invalid date. Please confirm your input data: ${this.value}`)
-        process.exit(1)
-      }
-    }
-  }
-
-  toString () {
-    const value = this.value || this.defaultValue
-    if (this.type === String) {
-      if (this.key === Key.keywords) {
-        return value
-      }
-      return value === '' ? '' : `${this.key}:${value}`
-    }
-    if (this.type === Number) {
-      return `${this.key}:${value}`
-    }
-    if (this.type === Date) {
-      return value === '' ? '' : `${this.key}:${value}`
-    }
-    if (this.type === Boolean && value === 'true') {
-      return this.key
-    }
-    throw new Error('Invalid type')
-  }
-}
 
 function showHelp () {
   const exampleFormText = `
