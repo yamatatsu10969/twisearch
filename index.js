@@ -102,6 +102,10 @@ const prompt = new Form({
 
 })
 
+function removeConsecutiveSpace (value) {
+  return value.replace(/^\s+|\s+$/g, '').replace(/ +/g, ' ')
+}
+
 prompt.run()
   .then(value => {
     queries.forEach(query => {
@@ -116,7 +120,8 @@ prompt.run()
 
     const querySuffix = '&src=typed_query&f=top'
 
-    const uri = baseUrl + queries.join(' ') + querySuffix
+    const queryString = removeConsecutiveSpace(queries.join(' '))
+    const uri = baseUrl + queryString + querySuffix
     const url = encodeURI(uri)
     console.log(url)
 
