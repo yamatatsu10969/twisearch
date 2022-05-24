@@ -22,8 +22,8 @@ Example Form:
       Since (yyyy-mm-dd) : 2020-03-09
       Until (yyyy-mm-dd) : 2022-10-28
            Filter images : true
-           Filter videos :
-            Filter links :
+           Filter videos : true
+            Filter links : true
 `
 console.log(exampleFormText)
 
@@ -47,8 +47,8 @@ const prompt = new Form({
 
 prompt.run()
   .then(value => {
-    if (value.keywords === '') {
-      console.log('Keyword is required')
+    if (value.keywords === '' && value.from === '' && value.to === '') {
+      console.log('Keywords or From user name or To user name is required')
       return
     }
     // example: https://twitter.com/search?q=Flutter%20min_faves%3A10&src=typed_query&f=top
@@ -60,6 +60,9 @@ prompt.run()
     // queries
     if (value.from !== '') {
       queries += ' from:' + value.from
+    }
+    if (value['-from'] !== '') {
+      queries += ' -from:' + value.from
     }
     if (value.to !== '') {
       queries += ' to:' + value.to
