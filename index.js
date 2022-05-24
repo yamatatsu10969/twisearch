@@ -36,11 +36,26 @@ class Query {
     this.value = value
   }
 
+  validate () {
+    if (this.type === Number && this.value < 0) {
+      console.log('Invalid number. Please use positive number')
+      process.exit(1)
+    }
+    if (this.type === Date && this.value !== '') {
+      if (!this.value.match(/\d{4}-\d{2}-\d{2}/)) {
+        console.log(`Invalid date format. Please use yyyy-mm-dd. Your input data: ${this.value}`)
+        process.exit(1)
+      }
+      const date = new Date(this.value)
+      if (isNaN(date.getDate())) {
+        console.log(`Invalid date. Please confirm your input data: ${this.value}`)
+        process.exit(1)
+      }
+    }
+  }
+
   toString () {
     const value = this.value || this.defaultValue
-    if (this.type === Boolean && value === 'true') {
-      return this.key
-    }
     if (this.type === String) {
       if (this.key === Key.keywords) {
         return value
@@ -50,7 +65,13 @@ class Query {
     if (this.type === Number) {
       return `${this.key}:${value}`
     }
-    return ''
+    if (this.type === Date) {
+      return value === '' ? '' : `${this.key}:${value}`
+    }
+    if (this.type === Boolean && value === 'true') {
+      return this.key
+    }
+    throw new Error('Invalid type')
   }
 }
 
@@ -77,8 +98,8 @@ showHelp()
 
 const queries = [
   new Query(Key.keywords, 'Keywords', String, ''),
-  new Query(Key.minFaves, 'Min favorites', Number, 0),
-  new Query(Key.minRetweets, 'Min retweets', Number, 0),
+  new Query(Key.minFaves, 'Min favorites', Number, '0'),
+  new Query(Key.minRetweets, 'Min retweets', Number, '0'),
   new Query(Key.from, 'From user name', String, ''),
   new Query(Key.exceptFrom, 'Except from user name', String, ''),
   new Query(Key.to, 'To user name', String, ''),
@@ -89,17 +110,18 @@ const queries = [
   new Query(Key.filterLinks, 'Filter links', Boolean, '')
 ]
 
+const choices = queries.map(query => {
+  return {
+    name: query.key,
+    message: query.description,
+    initial: query.defaultValue
+  }
+})
+
 const prompt = new Form({
   name: 'twesearch',
   message: 'Please input the following information:',
-  choices: queries.map(query => {
-    return {
-      name: query.key,
-      message: query.description,
-      initial: query.defaultValue
-    }
-  })
-
+  choices
 })
 
 function removeConsecutiveSpace (value) {
@@ -110,6 +132,7 @@ prompt.run()
   .then(value => {
     queries.forEach(query => {
       query.setValue(value[query.key])
+      query.validate()
     })
     if (value.keywords === '' && value.from === '' && value.to === '') {
       console.log('Keywords or From user name or To user name is required')
