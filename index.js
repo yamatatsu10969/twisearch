@@ -1,16 +1,11 @@
 #!/usr/bin/env node
 
 const { Form } = require('enquirer')
-const { platform } = require('os')
-const { exec } = require('child_process')
 
 const Key = require('./key')
 const Query = require('./query')
 const TwitterUrl = require('./twitter-url')
-
-const WINDOWS_PLATFORM = 'win32'
-const MAC_PLATFORM = 'darwin'
-const osPlatform = platform()
+const Browser = require('./browser')
 
 function showHelp () {
   const exampleFormText = `
@@ -65,14 +60,6 @@ prompt.run()
   .then(value => {
     const url = new TwitterUrl(queries, value).toString()
     console.log(url)
-
-    let command
-    if (osPlatform === WINDOWS_PLATFORM) {
-      command = `start ${url}`
-    } else if (osPlatform === MAC_PLATFORM) {
-      command = `open ${url}`
-    }
-
-    exec(command)
+    Browser.openWith(url)
   })
   .catch(console.error)
