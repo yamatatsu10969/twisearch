@@ -10,9 +10,10 @@ module.exports = class Query {
 
   setValue (value) {
     this.value = value
+    this.#validate()
   }
 
-  validate () {
+  #validate () {
     if (this.type === Number && this.value < 0) {
       console.log('Invalid number. Please use positive number')
       process.exit(1)

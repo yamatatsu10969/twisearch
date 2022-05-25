@@ -10,7 +10,6 @@ module.exports = class TwitterUrl {
     }
     queries.forEach(query => {
       query.setValue(formValue[query.key])
-      query.validate()
     })
   }
 
