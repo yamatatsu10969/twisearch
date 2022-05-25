@@ -28,38 +28,45 @@ Example Form:
 
 showHelp()
 
-const queries = [
-  new Query(Key.keywords, 'Keywords', String, ''),
-  new Query(Key.minFaves, 'Min favorites', Number, '0'),
-  new Query(Key.minRetweets, 'Min retweets', Number, '0'),
-  new Query(Key.from, 'From user name', String, ''),
-  new Query(Key.exceptFrom, 'Except from user name', String, ''),
-  new Query(Key.to, 'To user name', String, ''),
-  new Query(Key.since, 'Since (yyyy-mm-dd)', Date, ''),
-  new Query(Key.until, 'Until (yyyy-mm-dd)', Date, ''),
-  new Query(Key.filterImages, 'Filter images', Boolean, ''),
-  new Query(Key.filterVideos, 'Filter videos', Boolean, ''),
-  new Query(Key.filterLinks, 'Filter links', Boolean, '')
-]
+class TwiSearch {
+  static async run () {
+    const queries = [
+      new Query(Key.keywords, 'Keywords', String, ''),
+      new Query(Key.minFaves, 'Min favorites', Number, '0'),
+      new Query(Key.minRetweets, 'Min retweets', Number, '0'),
+      new Query(Key.from, 'From user name', String, ''),
+      new Query(Key.exceptFrom, 'Except from user name', String, ''),
+      new Query(Key.to, 'To user name', String, ''),
+      new Query(Key.since, 'Since (yyyy-mm-dd)', Date, ''),
+      new Query(Key.until, 'Until (yyyy-mm-dd)', Date, ''),
+      new Query(Key.filterImages, 'Filter images', Boolean, ''),
+      new Query(Key.filterVideos, 'Filter videos', Boolean, ''),
+      new Query(Key.filterLinks, 'Filter links', Boolean, '')
+    ]
 
-const choices = queries.map(query => {
-  return {
-    name: query.key,
-    message: query.description,
-    initial: query.defaultValue
+    const choices = queries.map(query => {
+      return {
+        name: query.key,
+        message: query.description,
+        initial: query.defaultValue
+      }
+    })
+
+    const prompt = new Form({
+      name: 'twesearch',
+      message: 'Please input the following information:',
+      choices
+    })
+
+    try {
+      const value = await prompt.run()
+      const url = new TwitterUrl(queries, value).toString()
+      console.log(url)
+      Browser.openWith(url)
+    } catch (e) {
+      console.error(e)
+    }
   }
-})
+}
 
-const prompt = new Form({
-  name: 'twesearch',
-  message: 'Please input the following information:',
-  choices
-})
-
-prompt.run()
-  .then(value => {
-    const url = new TwitterUrl(queries, value).toString()
-    console.log(url)
-    Browser.openWith(url)
-  })
-  .catch(console.error)
+TwiSearch.run()
