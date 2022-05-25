@@ -22,7 +22,8 @@
   },
   "homepage": "https://github.com/yamatatsu10969/twisearch#readme",
   "dependencies": {
-    "enquirer": "^2.3.6"
+    "enquirer": "^2.3.6",
+    "minimist": "^1.2.6"
   },
   "devDependencies": {
     "eslint": "^8.16.0",

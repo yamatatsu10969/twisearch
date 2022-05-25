@@ -1,48 +1,100 @@
 #!/usr/bin/env node
 
 const { Form } = require('enquirer')
+const minimist = require('minimist')
 
-// TODO(yamatatsu):  Search required installed packages
-const { platform } = require('os')
-const { exec } = require('child_process')
+const Key = require('./key')
+const Query = require('./query')
+const TwitterUrl = require('./twitter-url')
+const Browser = require('./browser')
 
-const WINDOWS_PLATFORM = 'win32'
-const MAC_PLATFORM = 'darwin'
-const osPlatform = platform()
-
-const prompt = new Form({
-  name: 'twesearch',
-  message: 'Please input the following information:',
-  choices: [
-    { name: 'keywords', message: 'Keywords', initial: '' },
-    { name: 'min_faves', message: 'Min Favorites', initial: '0' },
-    { name: 'min_retweets', message: 'Min Retweets', initial: '0' }
-  ]
-})
-
-prompt.run()
-  .then(value => {
-    if (value.keyword === '') {
-      console.log('Keyword is required')
+class TwiSearch {
+  static async run () {
+    const argv = minimist(process.argv.slice(2))
+    if (argv.help || argv.h) {
+      TwiSearch.#showHelp()
       return
     }
-    // example: https://twitter.com/search?q=Flutter%20min_faves%3A10&src=typed_query&f=top
-    const baseUrl = 'https://twitter.com/search'
-    let queries = '?q=' + value.keywords
-    queries += ' min_faves:' + value.min_faves
-    queries += ' min_retweets:' + value.min_retweets
-    queries += '&src=typed_query&f=top'
-    const uri = baseUrl + queries
-    const url = encodeURI(uri)
-    console.log(url)
 
-    let command
-    if (osPlatform === WINDOWS_PLATFORM) {
-      command = `start ${url}`
-    } else if (osPlatform === MAC_PLATFORM) {
-      command = `open ${url}`
+    const queries = [
+      new Query(Key.keywords, 'Keywords', String, ''),
+      new Query(Key.minFaves, 'Min favorites', Number, '0'),
+      new Query(Key.minRetweets, 'Min retweets', Number, '0'),
+      new Query(Key.from, 'From user name', String, ''),
+      new Query(Key.exceptFrom, 'Except from user name', String, ''),
+      new Query(Key.to, 'To user name', String, ''),
+      new Query(Key.since, 'Since (yyyy-mm-dd)', Date, ''),
+      new Query(Key.until, 'Until (yyyy-mm-dd)', Date, ''),
+      new Query(Key.filterImages, 'Filter images', Boolean, ''),
+      new Query(Key.filterVideos, 'Filter videos', Boolean, ''),
+      new Query(Key.filterLinks, 'Filter links', Boolean, '')
+    ]
+
+    const choices = queries.map(query => {
+      return {
+        name: query.key,
+        message: query.description,
+        initial: query.defaultValue
+      }
+    })
+
+    const prompt = new Form({
+      name: 'twesearch',
+      message: 'Please input the following information:',
+      choices
+    })
+
+    try {
+      const value = await prompt.run()
+      const url = new TwitterUrl(queries, value).toString()
+      console.log(url)
+      Browser.openWith(url)
+    } catch (e) {
+      console.error(e)
     }
+  }
 
-    exec(command)
-  })
-  .catch(console.error)
+  static #showHelp () {
+    const helpText = `
+Usage:  twisearch [options]
+        twisearch
+
+        Search Twitter is Enter key.
+        Move next form is Tab key.
+        Move previous form is Shift + Tab key.
+        Keywords or From user name or To user name is required.
+
+Options:
+  -h, --help              Show this help message
+
+Parameters:
+  Keywords                :String: Keywords to search. Multiple words can be set by separating them with a half space.
+  Min favorites           :Integer: Minimum favorites. Integer value must be positive.
+  Min retweets            :Integer: Minimum retweets. Integer value must be positive.
+  From user name          :String: User name to search from.
+  Except from user name   :String: User name to exclude from search.
+  To user name            :String: User name to search to.
+  Since (yyyy-mm-dd)      :Date: Date format is yyyy-mm-dd. Search tweets since the date.
+  Until (yyyy-mm-dd)      :Date: Date format is yyyy-mm-dd. Search tweets until the date.
+  Filter images           :Boolean: Filter tweets that contain images. Default is false.
+  Filter videos           :Boolean: Filter tweets that contain videos. Default is false.
+  Filter links            :Boolean: Filter tweets that contain links. Default is false.
+
+Example Form:
+                Keywords : Twitter Fun
+           Min favorites : 10000
+            Min retweets : 50
+          From user name : Twitter
+   Except from user name : Example
+            To user name : Facebook
+      Since (yyyy-mm-dd) : 2020-03-09
+      Until (yyyy-mm-dd) : 2022-10-28
+           Filter images : true
+           Filter videos :
+            Filter links : false
+`
+    console.log(helpText)
+  }
+}
+
+TwiSearch.run()
