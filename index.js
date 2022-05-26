@@ -47,6 +47,7 @@ class TwiSearch {
     try {
       const value = await prompt.run()
       const url = new TwitterUrl(queries, value).toString()
+      console.log('Open a browser with the following URL')
       console.log(url)
       Browser.openWith(url)
     } catch (e) {
