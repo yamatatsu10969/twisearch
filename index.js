@@ -3,10 +3,10 @@
 const { Form } = require('enquirer')
 const minimist = require('minimist')
 
-const Key = require('./key')
-const Query = require('./query')
-const TwitterUrl = require('./twitter-url')
-const Browser = require('./browser')
+const Key = require('./lib/key')
+const Query = require('./lib/query')
+const TwitterUrl = require('./lib/twitter-url')
+const Browser = require('./lib/browser')
 
 class TwiSearch {
   static async run () {
