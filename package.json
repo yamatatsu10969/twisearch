@@ -1,11 +1,15 @@
 {
     "name": "twisearch",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "Twisearch create url with queries for twitter.",
     "main": "index.js",
     "bin": {
         "chinchiro": "./index.js"
     },
+    "os": [
+        "darwin",
+        "win32"
+    ],
     "scripts": {
         "test": "twisearch"
     },
