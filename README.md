@@ -1,8 +1,10 @@
 # Twisearch
 
-Twesearch is a tool that makes it easy to perform advanced searches on Twitter.
+Twesearch is a CLI tool that makes it easy to perform advanced searches on Twitter.
 This tool opens your default browser with a URL based on the information you enter.
 Works only on Mac or Windows.
+
+![CleanShot 2022-05-27 at 11 12 57](https://user-images.githubusercontent.com/43805056/170615501-aa7ca466-c6ce-49ac-be34-60c40448fcc8.gif)
 
 ## Usage
 
