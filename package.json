@@ -1,6 +1,6 @@
 {
     "name": "twisearch",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Twisearch create url with queries for twitter.",
     "main": "index.js",
     "bin": {
